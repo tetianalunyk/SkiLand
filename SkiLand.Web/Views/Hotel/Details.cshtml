@@ -1,0 +1,238 @@
+﻿
+@{
+    @model SkiLand.Domain.Models.HotelDetailItem
+    ViewData["Title"] = "Готелі";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@section styles
+    {
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,400,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,400i,700" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/styles/hotels_styles.css">
+    <link rel="stylesheet" type="text/css" href="/styles/icomoon.css">
+    <link rel="stylesheet" type="text/css" href="/styles/style.css">
+
+    <link rel="stylesheet" type="text/css" href="/styles/hotels_responsive.css">
+}
+@section top_background
+    {
+    <div class="home">
+        <div class="home_background parallax-window" data-parallax="scroll" data-image-src="/images/@Model.PhotoPath" data-speed="0.4"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="home_content">
+                        <div class="home_content_inner">
+                            <h2 class="home_title text p-4">
+                                <span class="p-3 hotel-breadcrumb-title">
+                                    @Model.Name
+                                    <span class="rating rating_5 hotel-breadcrumb-padding">
+                                        @for (int i = 0; i < Model.Stars; i++)
+                                        {
+                                            <i class="fa fa-star"></i>
+                                        }
+                                    </span>
+                                </span>
+                            </h2>
+                            <div class="row">
+                                <div class="home_breadcrumbs col-md-6">
+                                    <ul class="home_breadcrumbs_list">
+                                        <li class="home_breadcrumb p-2 hotel-breadcrumb-title"><a href="/">Головна</a></li>
+                                        <li class="home_breadcrumb p-2 hotel-breadcrumb-title"><a href="/hotels">Готелі</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6 p-3 hotel-breadcrumb-title" >
+                                    <em class="color-w">"@Model.Description"</em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<p class="p-23"></p>
+<div class="row">
+    <div class="col-md-12 ">
+        <div class="room-wrap">
+            <div class="row text">
+                <div class="col-md-12 hotel-header-title">
+                    <div class="d-flex mb-1">
+                        <div class="one-third">
+                            <h6>
+                                <span><b>Тип номеру: &nbsp;&nbsp;&nbsp;</b> </span>
+                                @foreach (var type in Model.RoomTypes)
+                                {
+                                    <span> | </span>
+                                    @if (Model.Room.RoomType.Id == type.Id)
+                                    {
+                                        <span>@type.Title </span>
+                                    }
+                                    else
+                                    {
+                                        <a href="/hotels/@Model.Id/roomtype/@type.Id" class="p-3">@type.Title </a>
+                                    }
+                                }
+                                <span> |</span>
+
+                            </h6>
+                            <span class="hotel-raiting">Оцінка: @Model.Raiting</span>
+                        </div>
+                        <div class="two-forth text-center">
+                            <p class="price">@Model.Room.Price<span class="color-w"> грн/ніч</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            @for (int i = 0; i < Model.Room.Photos.Count(); i++)
+                            {
+                                <li data-target="#carouselExampleIndicators" data-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
+                            }
+                        </ol>
+                        <div class="carousel-inner">
+                            @foreach (var photo in Model.Room.Photos)
+                            {
+                                <div class="carousel-item @(Model.Room.Photos.First() == photo ? "active" : "")">
+                                    <img class="d-block w-100" src="/images/@photo">
+                                </div>
+                            }
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 text">
+                    <p class="hotel-title color-w"><span class="p-3"><b>Бронювання:</b></span></p>
+                    <div class="p-3">
+                        <form method="post">
+                            @if (ViewBag.Response != null && !ViewBag.Response.IsSuccessful)
+                            {
+                                foreach (var msg in ViewBag.Response.Messages)
+                                {
+                                    <div class="alert alert-danger" role="alert">@msg</div>
+                                }
+                            }
+
+                            @if (ViewBag.Request != null)
+                            {
+                                <div class="row alert alert-success" role="alert" style="font-size: 15px; margin-top: -15px; padding-top: 0px;">
+                                    <div class="col-md-12" >
+                                        <em>
+                                            <br />
+                                            Вітаємо, Ви успішно створили бронювання у нашому готелі!<br /> <br />
+                                            Бронювання автоматично підтвержено і на Вашу електронну пошту відправлено листа із деталями резервації.<br /><br />
+                                        </em>
+                                    </div>
+                                    <label class="col-md-6">Дата заїзду:</label>
+                                    <label class="col-md-6">@ViewBag.Request.StartDate.ToShortDateString()</label>
+                                    <label class="col-md-6">Дата виїзду:</label>
+                                    <label class="col-md-6">@ViewBag.Request.EndDate.ToShortDateString()</label>
+                                    <label class="col-md-6">Дорослих:</label>
+                                    <label class="col-md-6">@ViewBag.Request.Adults</label>
+                                    <label class="col-md-6">Дітей:</label>
+                                    <label class="col-md-6">@ViewBag.Request.Children</label>
+                                    
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-center"><a href="#" class="btn btn-primary">Створити нове бронювання?</a></div>
+                                </div>                                
+                            }
+
+                            @if (Model.ReservationResponse == null || !Model.ReservationResponse.IsSuccessful)
+                            {
+                            <input type="hidden" asp-for="ReservationRequest.HotelId" value="@Model.Id" />
+                            <input type="hidden" asp-for="ReservationRequest.RoomId" value="@Model.Room.Id" />
+                            <input type="hidden" asp-for="ReservationRequest.RoomTypeId" value="@Model.Room.RoomType.Id" />
+                            <div class="form-group row">
+                                <label class="col-md-6">Дата заїзду:</label>
+                                <input type="date" class="form-control col-md-6" required="required" asp-for="ReservationRequest.StartDate">
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">Дата виїзду:</div>
+                                <input type="date" class="form-control col-md-6" required="required" asp-for="ReservationRequest.EndDate" />
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">Дорослих:</div>
+                                <select class="form-control col-md-6" asp-for="ReservationRequest.Adults">
+                                    @for (int i = 1; i <= Model.Room.Adults; i++)
+                                    {
+                                        <option>@i</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">Дітей:</div>
+                                <select class="form-control col-md-6" asp-for="ReservationRequest.Adults">
+                                    <option>0</option>
+                                    @for (int i = 1; i < Model.Room.Children; i++)
+                                    {
+                                        <option>@i</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group text-right">
+                                <button class="btn btn-primary">Бронювати</button>
+                            </div>
+                            }
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <p class="hotel-title color-w" style="margin-top: 23px;"><span class="p-3"><b>Опис:</b></span></p>
+                    <div class="p-3" style="white-space: pre-line">
+                        @Model.Room.Description
+                    </div>
+                </div>
+                <div class="col-md-4 p-4">
+                    <p class="hotel-title color-w"><span class="p-3"><b>Карта:</b></span></p>
+                    <div id="map" class="bg-white"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="room-wrap">
+            <div class="text p-4">
+                <p class="features">
+                <p class="hotel-title color-w"><span class="p-3"><b>Зручності:</b></span></p>
+                <div class="row">
+                    @foreach (var amenity in Model.Room.Amenities)
+                    {
+                        <div class="col-md-4 mb-2"><i class="icon-check mr-2"></i> @amenity</div>
+                    }
+                </div>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+    {
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/styles/bootstrap4/popper.js"></script>
+    <script src="/styles/bootstrap4/bootstrap.min.js"></script>
+    <script src="/plugins/greensock/TweenMax.min.js"></script>
+    <script src="/plugins/greensock/TimelineMax.min.js"></script>
+    <script src="/plugins/scrollmagic/ScrollMagic.min.js"></script>
+    <script src="/plugins/greensock/animation.gsap.min.js"></script>
+    <script src="/plugins/greensock/ScrollToPlugin.min.js"></script>
+    <script src="/plugins/Isotope/isotope.pkgd.min.js"></script>
+    <script src="/plugins/easing/easing.js"></script>
+    <script src="/plugins/parallax-js-master/parallax.min.js"></script>
+    <script src="/js/offers_custom.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@(Model.Location)&sensor=false"></script>
+    <script src="/js/google-map.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
